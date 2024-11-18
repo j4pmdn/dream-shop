@@ -1,6 +1,7 @@
 package com.hdoan.dreamshops.service.product;
 
 import com.hdoan.dreamshops.exceptions.ProductNotFoundException;
+import com.hdoan.dreamshops.exceptions.ResourceNotFoundException;
 import com.hdoan.dreamshops.model.Category;
 import com.hdoan.dreamshops.model.Product;
 import com.hdoan.dreamshops.repository.CategoryRepository;
@@ -36,7 +37,7 @@ public class ProductService implements IProductService{
         return productRepository.save(createProduct(request, category));
     }
 
-    public Product createProduct(AddProductRequest request, Category category){
+    private Product createProduct(AddProductRequest request, Category category) {
         return new Product(
                 request.getName(),
                 request.getBrand(),
@@ -50,14 +51,14 @@ public class ProductService implements IProductService{
     @Override
     public Product getProductById(Long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found!"));
     }
 
     @Override
     public void deleteProductById(Long id) {
         productRepository.findById(id)
                 .ifPresentOrElse(productRepository::delete,
-                        () -> {throw new ProductNotFoundException("Product not found!");});
+                        () -> {throw new ResourceNotFoundException("Product not found!");});
     }
 
     @Override
@@ -65,7 +66,7 @@ public class ProductService implements IProductService{
         return productRepository.findById(productId)
                 .map(existingProduct -> updateExistingProduct(existingProduct, request))
                 .map(productRepository::save)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found!"));
     }
 
     private Product updateExistingProduct(Product existingProduct, ProductUpdateRequest request){
@@ -95,7 +96,7 @@ public class ProductService implements IProductService{
     }
 
     @Override
-    public List<Product> getProductsByCategoryAndByBrand(String category, String brand) {
+    public List<Product> getProductsByCategoryAndBrand(String category, String brand) {
         return productRepository.findByCategoryNameAndBrand(category, brand);
     }
 
